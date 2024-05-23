@@ -51,5 +51,5 @@ test:
 production:
   <<: *default
   database: book_microservice_production
-  username: book_microservice
-  password: <%= ENV["BOOK_MICROSERVICE_DATABASE_PASSWORD"] %>
+  username: admin
+  password: admin
