@@ -5,7 +5,7 @@ Rails.application.configure do
 
   # Code is not reloaded between requests.
   config.enable_reloading = false
-
+  config.log_formatter = ::Logger::Formatter.new
   # Eager load code on boot. This eager loads most of Rails and
   # your application in memory, allowing both threaded web servers
   # and those relying on copy on write to perform better.
@@ -55,7 +55,16 @@ Rails.application.configure do
   # Info include generic and useful information about system operation, but avoids logging too much
   # information to avoid inadvertent exposure of personally identifiable information (PII). If you
   # want to log everything, set the level to "debug".
-  config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
+  # config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
+  config.log_level = :info
+  if ENV["RAILS_LOG_TO_STDOUT"].present?
+    logger = ActiveSupport::Logger.new(STDOUT)
+    logger.formatter = config.log_formatter
+    config.logger = ActiveSupport::TaggedLogging.new(logger)
+  else
+    config.logger = ActiveSupport::TaggedLogging.new(Logger.new(Rails.root.join('log', 'production.log')))
+  end
+  config.log_formatter = ::Logger::Formatter.new
 
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store
@@ -73,6 +82,7 @@ Rails.application.configure do
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).
   config.i18n.fallbacks = true
+  config.log_level = :debug
 
   # Don't log any deprecations.
   config.active_support.report_deprecations = false
